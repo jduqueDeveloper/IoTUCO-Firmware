@@ -38,11 +38,10 @@ void mqtt_init(){
 
 void mqtt_conect(){
     while (!client.connected()) {
-    //Serial.println("Connecting to MQTT...");
  
-    if (client.connect("ESP8266Client")) {
+    if (client.connect("ESP8266Client", mqttUser, mqttPassword)) {
  
-      Serial.println("connected");
+      Serial.println("Broker connected");
       client.subscribe(InputTopic);
       publishInTopic(AliveTopic,"Alive"); 
  
