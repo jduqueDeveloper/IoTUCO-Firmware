@@ -5,15 +5,17 @@
 #include <mqtt/mqtt_service.h>
 #include <time/time_control.h>
 #include <DHT.h>
-
+#include <ArduinoJson.h>
 
 #define DHTPIN D5
+#define PINLUZ D2
+#define PINVENTILADOR D3
 
 const char* ssid = "xx";
 const char* password =  "xx";
-const char* mqttServer = "m16.cloudmqtt.com";
+const char* mqttServer = "xx";
 //const char* mqttServer = "xx";
-const int mqttPort = 00;
+const int mqttPort = 	00;
 const char* mqttUser = "xx";
 const char* mqttPassword = "xx";
 
@@ -64,11 +66,14 @@ void setup() {
 
   //Initilize humidity sensor
   dht.setup(DHTPIN);
-   
 
+  pinMode(PINLUZ,OUTPUT);
+  pinMode(PINVENTILADOR,OUTPUT);
+  
 }
 
 void loop() {
+  client.loop();
   timeClient.update();
   sec_Act = timeClient.getSeconds();
   if(IsTimeToRead(sec_Act)){
@@ -79,4 +84,12 @@ void loop() {
 
   }
 
+
+  if (message_arrived)
+  {
+    message_arrived = false;
+    jsonProcess(messageInTopic);
+    Serial.println("llego mensaje");
+    Serial.println(messageInTopic);
+  }
 }
