@@ -1,6 +1,16 @@
 #include "mqtt_service.h"
 
 bool message_arrived = false;
+String messageInTopic = "";
+const char* topicIncome = "";
+
+enum peripheral
+{
+  luz,
+  ventilador,
+  puerta,
+  cortinas
+};
 
 
 /********* MQTT Callback ***************************
@@ -13,19 +23,16 @@ bool message_arrived = false;
 void callback(char* topic, byte* payload, unsigned int length) {
 
   message_arrived = true;
+  messageInTopic="";
 
   //Notify about message arrived 
   Serial.print("Message arrived in topic: ");
   Serial.println(topic);
-  
-  String timePetition = "";
-  //urlTopic = url_api;
-  for (int i = 0; i < length; i++) {
-    timePetition += (char)payload[i];
-    //urlTopic += (char)payload[i];
-  }
+  topicIncome=topic;
 
-  message_arrived = true;
+  for (int i = 0; i < length; i++) {
+    messageInTopic += (char)payload[i];
+  }
 }
 
 void mqtt_init(){
@@ -41,7 +48,8 @@ void mqtt_conect(){
     if (client.connect("ESP8266Client")) {
  
       Serial.println("connected");
-      //client.subscribe(InputTopic);
+      client.subscribe(controlInvernadero);
+      client.subscribe(controlZona);
       publishInTopic(AliveTopic,"Alive"); 
  
     } else {
@@ -76,4 +84,46 @@ void publishDataFormat(const char *topic, String message){
     client.publish(topic, data);
     Serial.print("Published in: ");
     Serial.println(topic);
+}
+
+void jsonProcess(String topicMessage){
+    StaticJsonDocument<94> doc;
+    char messageChar[94];
+    messageInTopic.toCharArray(messageChar, 94);
+    deserializeJson(doc, messageChar);
+
+    char periferico = doc["Periferico"];
+    char valor = doc["Valor"];
+
+    String peripheralName = getPeripheralName(periferico);
+    
+    if(peripheralName == "luz"){
+      digitalWrite(PINPUERTA, valor);
+    }else if(peripheralName == "ventilador"){
+      digitalWrite(PINCORTINA, valor);
+    }else{
+      return;
+    }
+
+}
+
+String getPeripheralName(char peripheralNum)
+{
+
+    switch (peripheralNum)
+    {
+    case luz:
+        return "luz";
+        break;
+    case ventilador:
+        return "ventilador";
+        break;
+    case puerta:
+        return "puerta";
+        break;
+    case cortinas:
+        return "cortinas";
+        break;
+    }
+    return "";
 }

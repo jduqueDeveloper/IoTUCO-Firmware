@@ -9,12 +9,14 @@
 
 #define DHTPIN D5
 #define magneticSensor D7
+#define PINPUERTA D2
+#define PINCORTINA D3
 
 const char* ssid = "xx";
 const char* password =  "xx";
-const char* mqttServer = "m16.cloudmqtt.com";
-//const char* mqttServer = "192.168.0.110";
-const int mqttPort = xx;
+const char* mqttServer = "xx";
+//const char* mqttServer = "xx";
+const int mqttPort = 	00;
 const char* mqttUser = "xx";
 const char* mqttPassword = "xx";
 
@@ -67,6 +69,9 @@ void setup() {
 
   //Initilize humidity sensor
   dht.setup(DHTPIN);
+
+  pinMode(PINPUERTA,OUTPUT);
+  pinMode(PINCORTINA,OUTPUT);
   pinMode(magneticSensor, INPUT_PULLUP);
   doorStateAnt = digitalRead(magneticSensor);
 
@@ -75,6 +80,7 @@ void setup() {
 }
 
 void loop() {
+  client.loop();
   timeClient.update();
   sec_Act = timeClient.getSeconds();
   doorStateAct = digitalRead(magneticSensor);
@@ -89,5 +95,13 @@ void loop() {
   if(doorStateAct != doorStateAnt){
     doorInterrupt(doorStateAct);
     doorStateAnt = doorStateAct;
+  }
+
+  if (message_arrived)
+  {
+    message_arrived = false;
+    jsonProcess(messageInTopic);
+    Serial.println("llego mensaje");
+    Serial.println(messageInTopic);
   }
 }
