@@ -42,15 +42,15 @@ void mqtt_init(){
 
 
 void mqtt_conect(){
-    while (!client.connected()) {
+  while (!client.connected()) {
     //Serial.println("Connecting to MQTT...");
  
-    if (client.connect("ESP8266Client")) {
+    if (client.connect("ESP8266Client", mqttUser, mqttPassword)) {
  
-      Serial.println("connected");
-      client.subscribe(controlInvernadero);
-      client.subscribe(controlZona);
-      publishInTopic(AliveTopic,"Alive"); 
+      Serial.println("Broker connected");
+      client.subscribe(CONTROL_GREENHOUSE);
+      client.subscribe(CONTROL_ZONE);
+      publishDataFormat(ALIVE_TOPIC, aliveMessage()); 
  
     } else {
  
@@ -60,6 +60,38 @@ void mqtt_conect(){
  
     }
   }
+}
+
+void buildTopicsNames(){
+
+  
+//"medicion/zona/<zone>/invernadero/<greenhuose>/ingresos"
+  DoorTopic = "medicion/zona/";
+  DoorTopic += (String)zone;
+  DoorTopic += "/invernadero/";
+  DoorTopic += (String)greenhouse;
+  DoorTopic += "/ingresos";
+  DoorTopic.toCharArray(DOOR_TOPIC, 60);
+
+//"medicion/zona/<zone>/invernadero/<greenhuose>/ambiente"
+  EnviromentTopic = "medicion/zona/";
+  EnviromentTopic += (String)zone;
+  EnviromentTopic += "/invernadero/";
+  EnviromentTopic += (String)greenhouse;
+  EnviromentTopic += "/ambiente";
+  EnviromentTopic.toCharArray(ENVIROMENT_TOPIC, 60);
+
+//"control/zona/<zone>/invernadero/<greenhuose>"
+  controlInvernadero = "control/zona/";
+  controlInvernadero += (String)zone;
+  controlInvernadero += "/invernadero/";
+  controlInvernadero += (String)greenhouse;
+  controlInvernadero.toCharArray(CONTROL_GREENHOUSE, 60);
+
+//"control/zona/<zone>"
+  controlZona = "control/zona/";
+  controlZona += (String)zone;
+  controlZona.toCharArray(CONTROL_ZONE, 60);
 }
 
 void publishInTopic(const char *topic, const char* message){
@@ -92,14 +124,12 @@ void jsonProcess(String topicMessage){
     messageInTopic.toCharArray(messageChar, 94);
     deserializeJson(doc, messageChar);
 
-    char periferico = doc["Periferico"];
-    char valor = doc["Valor"];
+    int periferico = doc["peripheral"];
+    int valor = doc["value"];
 
-    String peripheralName = getPeripheralName(periferico);
-    
-    if(peripheralName == "luz"){
+    if(periferico == puerta){
       digitalWrite(PINPUERTA, valor);
-    }else if(peripheralName == "ventilador"){
+    }else if(periferico == cortinas){
       digitalWrite(PINCORTINA, valor);
     }else{
       return;
@@ -107,23 +137,3 @@ void jsonProcess(String topicMessage){
 
 }
 
-String getPeripheralName(char peripheralNum)
-{
-
-    switch (peripheralNum)
-    {
-    case luz:
-        return "luz";
-        break;
-    case ventilador:
-        return "ventilador";
-        break;
-    case puerta:
-        return "puerta";
-        break;
-    case cortinas:
-        return "cortinas";
-        break;
-    }
-    return "";
-}

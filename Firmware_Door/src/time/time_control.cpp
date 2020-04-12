@@ -6,9 +6,6 @@ char daysOfTheWeek[7][12] = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves"
 float humidity = 0.0;
 float temperature = 0.0;
 
-const int zona = 1;
-const int invernadero = 1;
-
 int timeToNextRead(){
     sec_Ant = timeClient.getSeconds() + 10;
 
@@ -30,38 +27,32 @@ bool IsTimeToRead(int sec_act){
 }
 
 String ReadSensor(){
-    humidity = dht.getHumidity();
-    temperature = dht.getTemperature();
+  humidity = dht.getHumidity();
+  temperature = dht.getTemperature();
 
-    String dataSensor = "{Temperatura: ";
-    dataSensor += temperature;
-    dataSensor += ", Zona: ";
-    dataSensor += zona;
-    dataSensor += ", Invernadero: ";
-    dataSensor += invernadero;
-    dataSensor += ", Hora: ";
-    dataSensor += daysOfTheWeek[timeClient.getDay()];
-    dataSensor += "/";
-    dataSensor += timeClient.getFormattedTime();
-    dataSensor += "}";
+  String dataSensor;
+  StaticJsonDocument<100> doc;
+  doc["temperatura"] = temperature;
+  doc["zona"] = zone;
+  doc["invernadero"] = greenhouse;
+  doc["hora"] = timeClient.getEpochTime();
+  doc["device_id"] = device_id;
+  serializeJson(doc, dataSensor);
 
-    return dataSensor;    
+  return dataSensor;    
 }
 
 void publishDoor(String doorState){
-    String dataDoor = "{accion: ";
-    dataDoor += doorState;
-    dataDoor += ", Zona: ";
-    dataDoor += zona;
-    dataDoor += ", Invernadero: ";
-    dataDoor += invernadero;
-    dataDoor += ", Hora: ";
-    dataDoor += daysOfTheWeek[timeClient.getDay()];
-    dataDoor += "/";
-    dataDoor += timeClient.getFormattedTime();
-    dataDoor += "}";
+  String dataDoor;
+  StaticJsonDocument<100> doc;
+  doc["accion"] = doorState;
+  doc["zona"] = zone;
+  doc["invernadero"] = greenhouse;
+  doc["hora"] = timeClient.getEpochTime();
+  doc["device_id"] = device_id;
+  serializeJson(doc, dataDoor);
 
-    publishDataFormat(DoorTopic, dataDoor);
+  publishDataFormat(DOOR_TOPIC, dataDoor);
 }
 
 void doorInterrupt(int state){
@@ -70,4 +61,23 @@ void doorInterrupt(int state){
   }else{
     publishDoor("Cerrado");
   }
+}
+
+String deviceIdName(){
+  String deviceName = (String)zone;
+  deviceName += "_";
+  deviceName += (String)greenhouse;
+
+  return deviceName;
+}
+
+String aliveMessage(){
+  String message;
+  StaticJsonDocument<100> doc;
+  doc["zona"] = zone;
+  doc["invernadero"] = greenhouse;
+  doc["device_id"] = device_id;
+  serializeJson(doc, message);
+
+  return message;
 }
