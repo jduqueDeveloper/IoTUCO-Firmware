@@ -7,7 +7,7 @@ float humidity = 0.0;
 float temperature = 0.0;
 
 int timeToNextRead(){
-    sec_Ant = timeClient.getSeconds() + 10;
+    sec_Ant = timeClient.getSeconds() + sensorReadPeriod;
 
     if (sec_Ant >= 60)
     {
@@ -31,13 +31,13 @@ String ReadSensor(){
     temperature = dht.getTemperature();
 
     String dataSensor;
-    StaticJsonDocument<100> doc;
-    doc["temperatura"] = temperature;
-    doc["humedad"] = humidity;
-    doc["zona"] = zone;
-    doc["invernadero"] = greenhouse;
-    doc["cama"] = growbed;
-    doc["hora"] = timeClient.getEpochTime();
+    StaticJsonDocument<120> doc;
+    doc["temperature"] = temperature;
+    doc["humidity"] = humidity;
+    doc["zone"] = zone;
+    doc["greenhouse"] = greenhouse;
+    doc["growbed"] = growbed;
+    doc["hour"] = timeClient.getEpochTime();
     doc["device_id"] = device_id;
     serializeJson(doc, dataSensor);
 
@@ -57,9 +57,9 @@ String deviceIdName(){
 String aliveMessage(){
     String message;
     StaticJsonDocument<100> doc;
-    doc["zona"] = zone;
-    doc["invernadero"] = greenhouse;
-    doc["cama"] = growbed;
+    doc["zone"] = zone;
+    doc["greenhuose"] = greenhouse;
+    doc["growbed"] = growbed;
     doc["device_id"] = device_id;
     serializeJson(doc, message);
 

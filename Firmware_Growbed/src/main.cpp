@@ -32,7 +32,7 @@ const char* mqttPassword = "xx";
 const int zone = 1;
 const int greenhouse = 1;
 const int growbed = 1;
-
+const int sensorReadPeriod = 10;
 DHT dht;
 
 const long utcOffsetInSeconds = -18000;
@@ -110,7 +110,7 @@ void loop() {
   {
     message_arrived = false;
     jsonProcess(messageInTopic);
-    Serial.println("llego mensaje");
+    Serial.println("Message arrive");
     Serial.println(messageInTopic);
   }
 }
