@@ -6,12 +6,8 @@ char daysOfTheWeek[7][12] = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves"
 float humidity = 0.0;
 float temperature = 0.0;
 
-const int zona = 1;
-const int invernadero = 1;
-const int cama = 1;
-
 int timeToNextRead(){
-    sec_Ant = timeClient.getSeconds() + 10;
+    sec_Ant = timeClient.getSeconds() + sensorReadPeriod;
 
     if (sec_Ant >= 60)
     {
@@ -34,24 +30,37 @@ String ReadSensor(){
     humidity = dht.getHumidity();
     temperature = dht.getTemperature();
 
-    String dataSensor = "{ Temperatura: ";
-    dataSensor += temperature;
-    dataSensor += ", Humedad: ";
-    dataSensor += humidity;
-    dataSensor += ", Zona: ";
-    dataSensor += zona;
-    dataSensor += ", Invernadero: ";
-    dataSensor += invernadero;
-    dataSensor += ", Cama: ";
-    dataSensor += cama;
-    dataSensor += ", Hora: ";
-    dataSensor += daysOfTheWeek[timeClient.getDay()];
-    dataSensor += "/";
-    dataSensor += timeClient.getFormattedTime();
-    dataSensor += "}";
+    String dataSensor;
+    StaticJsonDocument<120> doc;
+    doc["temperature"] = temperature;
+    doc["humidity"] = humidity;
+    doc["zone"] = zone;
+    doc["greenhouse"] = greenhouse;
+    doc["growbed"] = growbed;
+    doc["hour"] = timeClient.getEpochTime();
+    serializeJson(doc, dataSensor);
 
     return dataSensor;
-    //char date[50];
-    //dataSensor.toCharArray(date, 50);
-    
+}
+
+String deviceIdName(){
+
+    String deviceName = (String)zone;
+    deviceName += "_";
+    deviceName += (String)greenhouse;
+    deviceName += "_";
+    deviceName += (String)growbed;
+
+    return deviceName;
+}
+
+String aliveMessage(){
+    String message;
+    StaticJsonDocument<100> doc;
+    doc["zone"] = zone;
+    doc["greenhouse"] = greenhouse;
+    doc["growbed"] = growbed;
+    serializeJson(doc, message);
+
+    return message;
 }

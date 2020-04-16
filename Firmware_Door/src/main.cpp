@@ -12,6 +12,18 @@
 #define PINPUERTA D2
 #define PINCORTINA D3
 
+String DoorTopic;
+String EnviromentTopic;
+String controlInvernadero;
+String controlZona;
+String aliveTopic;
+
+char DOOR_TOPIC [60];
+char ENVIROMENT_TOPIC [60];
+char CONTROL_GREENHOUSE [60];
+char CONTROL_ZONE [60];
+char ALIVE_TOPIC [60];
+
 const char* ssid = "xx";
 const char* password =  "xx";
 const char* mqttServer = "xx";
@@ -19,6 +31,10 @@ const char* mqttServer = "xx";
 const int mqttPort = 	00;
 const char* mqttUser = "xx";
 const char* mqttPassword = "xx";
+
+const int zone = 1;
+const int greenhouse = 1;
+const int sensorReadPeriod = 10;
 
 DHT dht;
 
@@ -31,6 +47,7 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "south-america.pool.ntp.org", utcOffsetInSeconds);
 
 String dataInv;
+String device_id;
 int doorStateAnt = HIGH;
 int doorStateAct = HIGH;
 
@@ -56,6 +73,12 @@ void setup() {
   //Connect to WiFi
   setup_wifi();
 
+  //Build topics names
+  buildTopicsNames();
+
+  //build device_id name
+  //device_id = deviceIdName();
+
   //Connect to MQTT Broker
   mqtt_init();
  
@@ -75,8 +98,6 @@ void setup() {
   pinMode(magneticSensor, INPUT_PULLUP);
   doorStateAnt = digitalRead(magneticSensor);
 
-  //attachInterrupt(digitalPinToInterrupt(magneticSensor), doorInterrupt(), CHANGE);
-
 }
 
 void loop() {
@@ -88,7 +109,7 @@ void loop() {
   if(IsTimeToRead(sec_Act)){
     
     dataInv = ReadSensor();
-    publishDataFormat(EnviromentTopic, dataInv);
+    publishDataFormat(ENVIROMENT_TOPIC, dataInv);
     Serial.println(dataInv);
   }
 
@@ -101,7 +122,7 @@ void loop() {
   {
     message_arrived = false;
     jsonProcess(messageInTopic);
-    Serial.println("llego mensaje");
+    Serial.print("Message arrive: ");
     Serial.println(messageInTopic);
   }
 }

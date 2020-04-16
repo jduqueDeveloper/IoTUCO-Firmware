@@ -46,10 +46,10 @@ void mqtt_conect(){
     if (client.connect("ESP8266Client", mqttUser, mqttPassword)) {
  
       Serial.println("Broker connected");
-      client.subscribe(controlCama);
-      client.subscribe(controlInvernadero);
-      client.subscribe(controlZona);
-      publishInTopic(AliveTopic,"Alive"); 
+      client.subscribe(CONTROL_GREENHOUSE);
+      client.subscribe(CONTROL_GROWBED);
+      client.subscribe(CONTROL_ZONE);
+      publishDataFormat(ALIVE_TOPIC, aliveMessage()); 
  
     } else {
  
@@ -59,6 +59,50 @@ void mqtt_conect(){
  
     }
   }
+}
+
+void buildTopicsNames(){
+  
+//"medicion/zona/<zone>/invernadero/<greenhuose>/cama/<growbed>/ambiente"
+  GrowbedTopic = "medicion/zona/";
+  GrowbedTopic += (String)zone;
+  GrowbedTopic += "/invernadero/";
+  GrowbedTopic += (String)greenhouse;
+  GrowbedTopic += "/cama/";
+  GrowbedTopic += (String)growbed;
+  GrowbedTopic += "/ambiente";
+  GrowbedTopic.toCharArray(GROWBED_TOPIC, 60);
+
+//"medicion/zona/<zone>/invernadero/<greenhuose>/cama/<growbed>"
+  controlCama = "control/zona/";
+  controlCama += (String)zone;
+  controlCama += "/invernadero/";
+  controlCama += (String)greenhouse;
+  controlCama += "/cama/";
+  controlCama += (String)growbed;
+  controlCama.toCharArray(CONTROL_GROWBED, 60);
+
+//"control/zona/<zone>/invernadero/<greenhuose>"
+  controlInvernadero = "control/zona/";
+  controlInvernadero += (String)zone;
+  controlInvernadero += "/invernadero/";
+  controlInvernadero += (String)greenhouse;
+  controlInvernadero.toCharArray(CONTROL_GREENHOUSE, 60);
+
+//"control/zona/<zone>"
+  controlZona = "control/zona/";
+  controlZona += (String)zone;
+  controlZona.toCharArray(CONTROL_ZONE, 60);
+
+//"zona/<zone>/invernadero/<greenhuose>/cama/<growbed>/alive"
+  aliveTopic = "zona/";
+  aliveTopic += (String)zone;
+  aliveTopic += "/invernadero/";
+  aliveTopic += (String)greenhouse;
+  aliveTopic += "/cama/";
+  aliveTopic += (String)growbed;
+  aliveTopic += "/alive";
+  aliveTopic.toCharArray(ALIVE_TOPIC, 60);
 }
 
 void publishInTopic(const char *topic, const char* message){
@@ -71,17 +115,18 @@ void publishInTopic(const char *topic, const char* message){
     client.publish(topic, message);
 }
 
-void publishDataFormat(String message){
+void publishDataFormat(const char *topic, String message){
 
-    if (client.state() < 0)
-    {
+      if (client.state() < 0)
+      {
       mqtt_conect();
-    }
+      }
 
     char data[100];
     message.toCharArray(data, 100);
-    client.publish(GrowbedTopic, data);
-    Serial.println("Output published");
+    client.publish(topic, data);
+    Serial.print("Published in: ");
+    Serial.println(topic);
 }
 
 void jsonProcess(String topicMessage){
@@ -90,38 +135,15 @@ void jsonProcess(String topicMessage){
     messageInTopic.toCharArray(messageChar, 94);
     deserializeJson(doc, messageChar);
 
-    char periferico = doc["Periferico"];
-    char valor = doc["Valor"];
-
-    String peripheralName = getPeripheralName(periferico);
+    int periferico = doc["peripheral"];
+    int valor = doc["value"];
     
-    if(peripheralName == "luz"){
+    if(periferico == luz){
       digitalWrite(PINLUZ, valor);
-    }else if(peripheralName == "ventilador"){
+    }else if(periferico == ventilador){
       digitalWrite(PINVENTILADOR, valor);
     }else{
       return;
     }
 
-}
-
-String getPeripheralName(char peripheralNum)
-{
-
-    switch (peripheralNum)
-    {
-    case luz:
-        return "luz";
-        break;
-    case ventilador:
-        return "ventilador";
-        break;
-    case puerta:
-        return "puerta";
-        break;
-    case cortinas:
-        return "cortinas";
-        break;
-    }
-    return "";
 }
