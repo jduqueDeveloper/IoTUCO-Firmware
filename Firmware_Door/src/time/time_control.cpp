@@ -7,7 +7,7 @@ float humidity = 0.0;
 float temperature = 0.0;
 
 int timeToNextRead(){
-    sec_Ant = timeClient.getSeconds() + 10;
+    sec_Ant = timeClient.getSeconds() + sensorReadPeriod;
 
     if (sec_Ant >= 60)
     {
@@ -31,12 +31,11 @@ String ReadSensor(){
   temperature = dht.getTemperature();
 
   String dataSensor;
-  StaticJsonDocument<100> doc;
-  doc["temperatura"] = temperature;
-  doc["zona"] = zone;
-  doc["invernadero"] = greenhouse;
-  doc["hora"] = timeClient.getEpochTime();
-  doc["device_id"] = device_id;
+  StaticJsonDocument<120> doc;
+  doc["temperature"] = temperature;
+  doc["zone"] = zone;
+  doc["greenhouse"] = greenhouse;
+  doc["hour"] = timeClient.getEpochTime();
   serializeJson(doc, dataSensor);
 
   return dataSensor;    
@@ -44,12 +43,11 @@ String ReadSensor(){
 
 void publishDoor(String doorState){
   String dataDoor;
-  StaticJsonDocument<100> doc;
-  doc["accion"] = doorState;
-  doc["zona"] = zone;
-  doc["invernadero"] = greenhouse;
-  doc["hora"] = timeClient.getEpochTime();
-  doc["device_id"] = device_id;
+  StaticJsonDocument<120> doc;
+  doc["action"] = doorState;
+  doc["zone"] = zone;
+  doc["greenhouse"] = greenhouse;
+  doc["hour"] = timeClient.getEpochTime();
   serializeJson(doc, dataDoor);
 
   publishDataFormat(DOOR_TOPIC, dataDoor);
@@ -57,9 +55,9 @@ void publishDoor(String doorState){
 
 void doorInterrupt(int state){
   if(state == HIGH){
-    publishDoor("Abierto");
+    publishDoor("Opened");
   }else{
-    publishDoor("Cerrado");
+    publishDoor("Closed");
   }
 }
 
@@ -74,9 +72,8 @@ String deviceIdName(){
 String aliveMessage(){
   String message;
   StaticJsonDocument<100> doc;
-  doc["zona"] = zone;
-  doc["invernadero"] = greenhouse;
-  doc["device_id"] = device_id;
+  doc["zone"] = zone;
+  doc["greenhouse"] = greenhouse;
   serializeJson(doc, message);
 
   return message;

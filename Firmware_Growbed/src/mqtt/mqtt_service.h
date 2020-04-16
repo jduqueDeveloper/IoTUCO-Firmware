@@ -7,7 +7,6 @@
 #include <ArduinoJson.h>
 #include "time/time_control.h"
 
-#define ALIVE_TOPIC "alive"
 #define PINLUZ D2
 #define PINVENTILADOR D3
 
@@ -24,11 +23,13 @@ extern String GrowbedTopic;
 extern String controlZona;
 extern String controlInvernadero;
 extern String controlCama;
+extern String aliveTopic;
 
 extern char GROWBED_TOPIC [60];
 extern char CONTROL_ZONE [60];
 extern char CONTROL_GREENHOUSE [60];
 extern char CONTROL_GROWBED [60];
+extern char ALIVE_TOPIC [60];
 
 extern const int zone;
 extern const int greenhouse;

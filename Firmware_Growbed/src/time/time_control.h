@@ -23,5 +23,7 @@ extern const int greenhouse;
 extern const int growbed;
 extern String device_id;
 
+extern const int sensorReadPeriod;
+
 extern NTPClient timeClient;
 #endif
