@@ -16,11 +16,13 @@ String DoorTopic;
 String EnviromentTopic;
 String controlInvernadero;
 String controlZona;
+String aliveTopic;
 
 char DOOR_TOPIC [60];
 char ENVIROMENT_TOPIC [60];
 char CONTROL_GREENHOUSE [60];
 char CONTROL_ZONE [60];
+char ALIVE_TOPIC [60];
 
 const char* ssid = "xx";
 const char* password =  "xx";
@@ -75,7 +77,7 @@ void setup() {
   buildTopicsNames();
 
   //build device_id name
-  device_id = deviceIdName();
+  //device_id = deviceIdName();
 
   //Connect to MQTT Broker
   mqtt_init();

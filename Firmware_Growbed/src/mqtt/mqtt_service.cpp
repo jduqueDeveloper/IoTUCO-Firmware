@@ -73,13 +73,13 @@ void buildTopicsNames(){
   GrowbedTopic += "/ambiente";
   GrowbedTopic.toCharArray(GROWBED_TOPIC, 60);
 
-//"medicion/zona/<zone>/invernadero/<greenhuose>/ambiente"
+//"medicion/zona/<zone>/invernadero/<greenhuose>/cama/<growbed>"
   controlCama = "control/zona/";
   controlCama += (String)zone;
   controlCama += "/invernadero/";
   controlCama += (String)greenhouse;
-  GrowbedTopic += "/cama/";
-  GrowbedTopic += (String)growbed;
+  controlCama += "/cama/";
+  controlCama += (String)growbed;
   controlCama.toCharArray(CONTROL_GROWBED, 60);
 
 //"control/zona/<zone>/invernadero/<greenhuose>"
@@ -93,6 +93,16 @@ void buildTopicsNames(){
   controlZona = "control/zona/";
   controlZona += (String)zone;
   controlZona.toCharArray(CONTROL_ZONE, 60);
+
+//"zona/<zone>/invernadero/<greenhuose>/cama/<growbed>/alive"
+  aliveTopic = "zona/";
+  aliveTopic += (String)zone;
+  aliveTopic += "/invernadero/";
+  aliveTopic += (String)greenhouse;
+  aliveTopic += "/cama/";
+  aliveTopic += (String)growbed;
+  aliveTopic += "/alive";
+  aliveTopic.toCharArray(ALIVE_TOPIC, 60);
 }
 
 void publishInTopic(const char *topic, const char* message){

@@ -92,6 +92,14 @@ void buildTopicsNames(){
   controlZona = "control/zona/";
   controlZona += (String)zone;
   controlZona.toCharArray(CONTROL_ZONE, 60);
+
+  //"zona/<zone>/invernadero/<greenhuose>/cama/<growbed>/alive"
+  aliveTopic = "zona/";
+  aliveTopic += (String)zone;
+  aliveTopic += "/invernadero/";
+  aliveTopic += (String)greenhouse;
+  aliveTopic += "/alive";
+  aliveTopic.toCharArray(ALIVE_TOPIC, 60);
 }
 
 void publishInTopic(const char *topic, const char* message){

@@ -7,7 +7,6 @@
 #include <ArduinoJson.h>
 #include "time/time_control.h"
 
-#define ALIVE_TOPIC "alive"
 #define PINPUERTA D2 
 #define PINCORTINA D3
 
@@ -24,11 +23,13 @@ extern String DoorTopic;
 extern String EnviromentTopic;
 extern String controlInvernadero;
 extern String controlZona;
+extern String aliveTopic;
 
 extern char DOOR_TOPIC [60];
 extern char ENVIROMENT_TOPIC [60];
 extern char CONTROL_GREENHOUSE [60];
 extern char CONTROL_ZONE [60];
+extern char ALIVE_TOPIC [60];
 
 extern void mqtt_init();
 extern void mqtt_conect();

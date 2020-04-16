@@ -38,13 +38,13 @@ String ReadSensor(){
     doc["greenhouse"] = greenhouse;
     doc["growbed"] = growbed;
     doc["hour"] = timeClient.getEpochTime();
-    doc["device_id"] = device_id;
     serializeJson(doc, dataSensor);
 
     return dataSensor;
 }
 
 String deviceIdName(){
+
     String deviceName = (String)zone;
     deviceName += "_";
     deviceName += (String)greenhouse;
@@ -58,9 +58,8 @@ String aliveMessage(){
     String message;
     StaticJsonDocument<100> doc;
     doc["zone"] = zone;
-    doc["greenhuose"] = greenhouse;
+    doc["greenhouse"] = greenhouse;
     doc["growbed"] = growbed;
-    doc["device_id"] = device_id;
     serializeJson(doc, message);
 
     return message;

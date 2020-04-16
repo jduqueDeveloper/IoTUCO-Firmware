@@ -31,12 +31,11 @@ String ReadSensor(){
   temperature = dht.getTemperature();
 
   String dataSensor;
-  StaticJsonDocument<100> doc;
+  StaticJsonDocument<120> doc;
   doc["temperature"] = temperature;
   doc["zone"] = zone;
   doc["greenhouse"] = greenhouse;
   doc["hour"] = timeClient.getEpochTime();
-  doc["device_id"] = device_id;
   serializeJson(doc, dataSensor);
 
   return dataSensor;    
@@ -44,12 +43,11 @@ String ReadSensor(){
 
 void publishDoor(String doorState){
   String dataDoor;
-  StaticJsonDocument<100> doc;
+  StaticJsonDocument<120> doc;
   doc["action"] = doorState;
   doc["zone"] = zone;
   doc["greenhouse"] = greenhouse;
   doc["hour"] = timeClient.getEpochTime();
-  doc["device_id"] = device_id;
   serializeJson(doc, dataDoor);
 
   publishDataFormat(DOOR_TOPIC, dataDoor);
@@ -76,7 +74,6 @@ String aliveMessage(){
   StaticJsonDocument<100> doc;
   doc["zone"] = zone;
   doc["greenhouse"] = greenhouse;
-  doc["device_id"] = device_id;
   serializeJson(doc, message);
 
   return message;
